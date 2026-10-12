@@ -454,6 +454,109 @@
         [hidden] {
             display: none !important
         }
+
+        .tabs {
+            max-width: 520px;
+            margin: 0 0 18px
+        }
+
+        .tabs button {
+            padding: 11px 8px
+        }
+
+        .rgrid {
+            display: grid;
+            gap: 16px;
+            grid-template-columns: 1fr
+        }
+
+        @media(min-width:900px) {
+            .rgrid {
+                grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+                align-items: start
+            }
+        }
+
+        button.pri {
+            background: var(--ac);
+            color: #fff;
+            border-color: var(--ac);
+            font-weight: 600
+        }
+
+        .chk {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: .95rem;
+            margin: 4px 0 12px;
+            cursor: pointer
+        }
+
+        .chk input {
+            width: 20px;
+            height: 20px;
+            padding: 0;
+            flex: none;
+            accent-color: var(--ac)
+        }
+
+        .stats {
+            display: grid;
+            gap: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            margin-top: 16px
+        }
+
+        .stat {
+            border: 1px solid var(--bd);
+            border-radius: 14px;
+            padding: 14px;
+            background: var(--card)
+        }
+
+        .stat.hl {
+            background: var(--okbg);
+            border: 2px solid var(--okbd)
+        }
+
+        .stat .sl {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--mut);
+            font-size: .82rem;
+            font-weight: 600
+        }
+
+        .stat .sl .ic {
+            width: 18px;
+            height: 18px
+        }
+
+        .stat .sv {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-top: 4px;
+            line-height: 1.2
+        }
+
+        .stat.hl .sv {
+            color: var(--ok)
+        }
+
+        .stat .ss {
+            color: var(--mut);
+            font-size: .8rem
+        }
+
+        .rec.no {
+            background: var(--errbg);
+            border-color: var(--err);
+            color: var(--err);
+            box-shadow: none
+        }
     </style>
 </head>
 
@@ -494,6 +597,11 @@
             <path
                 d="M12 2v2M12 20v2M4.900 4.900l1.400 1.400M17.700 17.700l1.400 1.400M2 12h2M20 12h2M4.900 19.100l1.400-1.400M17.700 6.300l1.400-1.400" />
         </symbol>
+        <symbol id="i-route" viewBox="0 0 24 24">
+            <circle cx="6" cy="19" r="2" />
+            <circle cx="18" cy="5" r="2" />
+            <path d="M8 19h7.500a3.500 3.500 0 0 0 0-7h-7a3.500 3.500 0 0 1 0-7H16" />
+        </symbol>
         <symbol id="i-moon" viewBox="0 0 24 24">
             <path d="M21 12.800A9 9 0 1 1 11.200 3a7 7 0 0 0 9.800 9.800z" />
         </symbol>
@@ -508,8 +616,11 @@
             </div>
             <button type="button" class="themebtn" id="themeBtn"></button>
         </header>
+        <nav class="seg tabs" role="tablist" aria-label="Funcionalidades"><button type="button" data-v="compare"
+                class="on">⛽ Comparar combustíveis</button><button type="button" data-v="route">🧭 Calcular
+                rota</button></nav>
 
-        <div class="grid">
+        <div class="grid" id="viewCompare">
             <section class="card">
                 <h2><svg class="ic">
                         <use href="#i-coin" />
@@ -562,6 +673,48 @@
                 é aplicado automaticamente ao diesel aditivado: utilize o consumo real que você mede com cada
                 combustível.</div>
         </div>
+
+        <div id="viewRoute" hidden>
+            <div class="rgrid">
+                <section class="card">
+                    <h2><svg class="ic">
+                            <use href="#i-route" />
+                        </svg>Calcular rota</h2>
+                    <div class="f"><label>Tipo de combustível</label>
+                        <div class="seg" id="rSegFuel" style="margin:0"><button type="button" data-f="flex"
+                                class="on">Gasolina / Etanol</button><button type="button"
+                                data-f="diesel">Diesel</button></div>
+                    </div>
+                    <div class="f"><label for="rp">Preço do combustível por litro (R$)</label>
+                        <input id="rp" data-money inputmode="numeric" placeholder="R$ 0,00" autocomplete="off">
+                    </div>
+                    <div class="f"><label for="rb">Valor que deseja abastecer (R$) <small>(opcional)</small></label>
+                        <input id="rb" data-money inputmode="numeric" placeholder="R$ 0,00" autocomplete="off">
+                    </div>
+                    <div class="row">
+                        <div class="f"><label for="rc">Consumo médio (km/l)</label><input id="rc" data-dec data-u="km/l"
+                                inputmode="decimal" placeholder="Ex.: 12,5 km/l" autocomplete="off"></div>
+                        <div class="f"><label for="rd">Distância até o destino (km)</label><input id="rd" data-dec
+                                data-u="km" inputmode="decimal" placeholder="Ex.: 150 km" autocomplete="off"></div>
+                    </div>
+                    <div class="f"><label>Tipo de percurso</label>
+                        <div class="seg" id="rSegTrip" style="margin:0"><button type="button" data-t="1"
+                                class="on">Somente ida</button><button type="button" data-t="2">Ida e volta</button>
+                        </div>
+                    </div>
+                    <label class="chk"><input type="checkbox" id="rNeed" checked> Calcular combustível necessário para a
+                        rota</label>
+                    <div class="f" id="rTankWrap"><label for="rt">Combustível já no tanque (litros)
+                            <small>(opcional)</small></label>
+                        <input id="rt" data-dec data-u="L" inputmode="decimal" placeholder="Ex.: 10 L"
+                            autocomplete="off">
+                    </div>
+                    <div class="tools"><button type="button" class="pri" id="rGo">Calcular Rota</button><button
+                            type="button" id="rClear">Limpar</button></div>
+                </section>
+                <section id="rOut" aria-live="polite"></section>
+            </div>
+        </div>
     </main>
 
     <script>
@@ -586,7 +739,7 @@
             let v = el.value.replace(/[^\d.,]/g, '').replace(/\./g, ',');
             const i = v.indexOf(','); if (i >= 0) v = v.slice(0, i + 1) + v.slice(i + 1).replace(/,/g, '');
             v = v.slice(0, 6);
-            el.value = v ? v + ' km/l' : '';
+            el.value = v ? v + ' ' + (el.dataset.u || 'km/l') : '';
             if (v) el.setSelectionRange(v.length, v.length);
         }
         const num = el => el.value.replace(/[^\d,]/g, '');
@@ -718,27 +871,120 @@
         function setMode(m) {
             mode = m;
             document.querySelectorAll('.fz').forEach(e => e.hidden = e.dataset.m !== m);
-            document.querySelectorAll('.seg button').forEach(b => b.classList.toggle('on', b.dataset.m === m));
+            document.querySelectorAll('#viewCompare .seg button').forEach(b => b.classList.toggle('on', b.dataset.m === m));
             $('compCard').hidden = m !== 'flex'; $('warnF').hidden = m !== 'flex'; $('warnD').hidden = m === 'flex';
             calc();
         }
 
         /* ---------- Eventos ---------- */
         buildFields();
-        document.querySelectorAll('[data-money]').forEach(el => el.addEventListener('input', () => { maskMoney(el); calc() }));
+        const upd = el => el.closest('#viewRoute') ? routeUpdate() : calc();   // atualiza a aba em uso
+        document.querySelectorAll('[data-money]').forEach(el => el.addEventListener('input', () => { maskMoney(el); upd(el) }));
         document.querySelectorAll('[data-dec]').forEach(el => {
-            el.addEventListener('input', () => { maskDec(el); calc() });
+            el.addEventListener('input', () => { maskDec(el); upd(el) });
             const f = () => { const n = num(el).length; if (el.value) setTimeout(() => el.setSelectionRange(n, n), 0) };
             el.addEventListener('focus', f); el.addEventListener('click', f);
         });
         $('mix').addEventListener('input', calc);
         $('resetMix').onclick = () => { $('mix').value = 30; calc() };
         $('clear').onclick = () => {
-            document.querySelectorAll('[data-money],[data-dec]').forEach(el => { el.value = ''; el.dataset.cents = '' });
+            document.querySelectorAll('#viewCompare [data-money],#viewCompare [data-dec]').forEach(el => { el.value = ''; el.dataset.cents = '' });
             $('mix').value = 30; calc();
         };
-        document.querySelectorAll('.seg button').forEach(b => b.onclick = () => setMode(b.dataset.m));
+        document.querySelectorAll('#viewCompare .seg button').forEach(b => b.onclick = () => setMode(b.dataset.m));
         $('infoBtn').onclick = () => { const t = $('infoTip'); t.hidden = !t.hidden; $('infoBtn').setAttribute('aria-expanded', String(!t.hidden)) };
+
+        /* ---------- Calcular Rota ---------- */
+        let rFuel = 'flex', rTrip = 1, rDone = false, rInit = false;
+        const kmf = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 1 });
+        const fmtKm = v => kmf.format(v) + ' km';
+        const fmtL = v => n2.format(v) + ' L';
+        const z = x => x < 0.005 ? 0 : x;   // evita resíduos de ponto flutuante (menos de 5 mL)
+        const ROUTE_HINT = '<div class="card hint"><div style="font-size:2.5rem">🧭</div>Preencha os dados da viagem e toque em <b>Calcular Rota</b>.</div>';
+
+        function setView(v) {
+            $('viewCompare').hidden = v !== 'compare'; $('viewRoute').hidden = v !== 'route';
+            document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+            if (v === 'route') { if (!rInit) { rFuel = mode; rInit = true; } paintRoute(); }
+        }
+        function paintRoute() {
+            document.querySelectorAll('#rSegFuel button').forEach(b => b.classList.toggle('on', b.dataset.f === rFuel));
+            document.querySelectorAll('#rSegTrip button').forEach(b => b.classList.toggle('on', +b.dataset.t === rTrip));
+            $('rTankWrap').hidden = !$('rNeed').checked;
+        }
+        function routeUpdate() { if (rDone) routeCalc(); }   // depois do 1º cálculo, recalcula a cada alteração
+
+        function routeCalc() {
+            const out = $('rOut'), need = $('rNeed').checked;
+            ['rp', 'rb', 'rc', 'rd', 'rt'].forEach(i => $(i).classList.remove('bad'));
+            const p = money($('rp')), b = money($('rb')), c = dec($('rc')), d = dec($('rd')), t = need ? dec($('rt')) : null;
+            const errs = [], bad = (id, m) => { errs.push(m); $(id).classList.add('bad') };
+            if (p === null) bad('rp', 'Informe o preço do combustível por litro.');
+            if (c === null) bad('rc', 'Informe o consumo médio do veículo (km/l).'); else if (!(c > 0)) bad('rc', 'O consumo médio deve ser maior que zero.');
+            if (d === null) bad('rd', 'Informe a distância até o destino.'); else if (!(d > 0)) bad('rd', 'A distância deve ser maior que zero.');
+            if (t !== null && !(t >= 0)) bad('rt', 'A quantidade no tanque não pode ser negativa.');
+            if (!need && b === null) bad('rb', 'Informe o valor que deseja abastecer ou marque "Calcular combustível necessário para a rota".');
+            if (errs.length) { out.innerHTML = errs.map(e => `<div class="msg">⚠️ ${e}</div>`).join(''); return; }
+
+            const trip = rTrip === 2 ? 'Ida e volta' : 'Somente ida';
+            const km = d * rTrip;                 // ida: 1× a distância | ida e volta: 2×
+            const lNeed = km / c;                   // litros necessários = distância total ÷ consumo
+            const cost = lNeed * p;                // custo total = litros necessários × preço por litro
+            const tank = t || 0;                   // combustível já disponível no tanque
+            const lFill = b !== null ? b / p : 0;     // litros abastecidos = valor ÷ preço por litro
+            const avail = lFill + tank;             // combustível disponível para a rota
+            const range = avail * c;                // autonomia = litros disponíveis × consumo
+            const lPut = z(Math.max(0, lNeed - tank));    // litros a colocar para completar a rota (nunca negativo)
+            const lMiss = z(Math.max(0, lNeed - avail));   // litros que faltam após o abastecimento informado
+
+            let ok = true, bt, bs;
+            if (need) {
+                if (b !== null) {
+                    if (lMiss === 0) { bt = 'Combustível suficiente para a rota'; bs = `Com ${brl.format(b)} (${fmtL(lFill)})${tank ? ` e ${fmtL(tank)} no tanque` : ''} você percorre ${fmtKm(km)} e ainda sobram cerca de ${fmtL(Math.max(0, avail - lNeed))}.`; }
+                    else { ok = false; bt = 'Combustível insuficiente para a rota'; bs = `Faltam ${fmtL(lMiss)}: você ainda precisa gastar ${brl.format(lMiss * p)} para completar a viagem.`; }
+                } else if (lPut === 0) { bt = 'O combustível do tanque já é suficiente'; bs = `Os ${fmtL(tank)} no tanque cobrem os ${fmtKm(km)} da rota.`; }
+                else { bt = `Abasteça ${fmtL(lPut)} (${brl.format(lPut * p)})`; bs = `Quantidade necessária para completar os ${fmtKm(km)} da rota${tank ? ', já descontando o que há no tanque' : ''}.`; }
+            } else { bt = `Com ${brl.format(b)} você abastece ${fmtL(lFill)}`; bs = `Autonomia estimada: ${fmtKm(range)}. Distância total da rota: ${fmtKm(km)}.`; }
+
+            const st = (ic, l, v, s) => `<div class="stat hl"><div class="sl">${icon(ic)}${l}</div><div class="sv">${v}</div>${s ? `<div class="ss">${s}</div>` : ''}</div>`;
+            let stats;
+            if (need) {
+                const extra = b !== null ? lMiss * p : lPut * p;
+                stats = st('drop', 'Litros necessários', fmtL(lNeed), `${fmtKm(km)} ÷ ${kmf.format(c)} km/l`)
+                    + st('coin', 'Custo total da viagem', brl.format(cost), `${fmtL(lNeed)} × ${brl.format(p)}`)
+                    + st('coin', b !== null ? 'Valor adicional necessário' : 'Valor para abastecer', brl.format(extra),
+                        b !== null ? (lMiss ? `Faltam ${fmtL(lMiss)}` : 'Nada a acrescentar') : (lPut ? `${fmtL(lPut)} a colocar` : 'Tanque suficiente'));
+            } else {
+                stats = st('drop', 'Litros que poderá abastecer', fmtL(lFill), brl.format(b)) + st('km', 'Autonomia estimada', fmtKm(range)) + st('route', 'Distância total', fmtKm(km), trip);
+            }
+
+            const row = (a, v) => `<div class="kv"><span>${a}</span><b>${v}</b></div>`;
+            let rows = row('Tipo de combustível', rFuel === 'flex' ? 'Gasolina / Etanol' : 'Diesel') + row('Tipo de percurso', trip) + row('Distância total', fmtKm(km));
+            if (need) {
+                rows += row('Combustível necessário', fmtL(lNeed)) + row('Preço por litro', brl.format(p)) + row('Custo total da viagem', brl.format(cost));
+                if (t !== null) rows += row('Combustível no tanque', fmtL(tank));
+                rows += row('Litros a colocar para completar a rota', fmtL(lPut)) + row('Valor necessário para abastecer', brl.format(lPut * p));
+            } else rows += row('Preço por litro', brl.format(p));
+            if (b !== null) rows += row('Valor do abastecimento', brl.format(b)) + row('Litros que poderá abastecer', fmtL(lFill));
+            if (b !== null || tank > 0) rows += row('Autonomia estimada', fmtKm(range));
+            if (need && b !== null) rows += row('Combustível que falta', fmtL(lMiss)) + row('Valor adicional necessário', brl.format(lMiss * p));
+
+            out.innerHTML = `<div class="rec ${ok ? '' : 'no'}">${icon(ok ? 'ok' : 'info')}<div><b>${bt}</b><span>${bs}</span></div></div>
+    <div class="stats">${stats}</div>
+    <div class="card" style="margin-top:16px"><h2>${icon('route')}Resumo da rota</h2>${rows}
+    <p class="note">A autonomia considera o combustível abastecido e o que já está no tanque. É uma estimativa baseada no consumo médio informado: trânsito, carga, relevo e estilo de condução alteram o consumo real, então considere uma margem de segurança.</p></div>`;
+        }
+
+        $('rGo').onclick = () => { rDone = true; routeCalc(); };
+        $('rClear').onclick = () => {
+            document.querySelectorAll('#viewRoute [data-money],#viewRoute [data-dec]').forEach(el => { el.value = ''; el.dataset.cents = '' });
+            $('rNeed').checked = true; rTrip = 1; rDone = false; paintRoute(); $('rOut').innerHTML = ROUTE_HINT;
+        };
+        $('rNeed').onchange = () => { paintRoute(); routeUpdate(); };
+        document.querySelectorAll('#rSegFuel button').forEach(b => b.onclick = () => { rFuel = b.dataset.f; paintRoute(); routeUpdate(); });
+        document.querySelectorAll('#rSegTrip button').forEach(b => b.onclick = () => { rTrip = +b.dataset.t; paintRoute(); routeUpdate(); });
+        document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => setView(b.dataset.v));
+        $('rOut').innerHTML = ROUTE_HINT;
 
         /* ---------- Tema claro/escuro (segue o sistema até o usuário escolher) ---------- */
         const root = document.documentElement, mq = matchMedia('(prefers-color-scheme: dark)');
