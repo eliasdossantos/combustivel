@@ -76,7 +76,7 @@ Não precisa instalar nada. Clone o repositório e abra o arquivo no navegador:
 ```bash
 git clone https://github.com/<seu-usuario>/combustivel.git
 cd combustivel
-# abra calculadora-combustivel.html no navegador (ou renomeie para index.html)
+# abra index.html no navegador (ou renomeie para index.html)
 ```
 
 ## Personalização
@@ -89,7 +89,7 @@ cd combustivel
 
 ```
 combustivel/
-├── calculadora-combustivel.html   # HTML, CSS e JavaScript em um único arquivo
+├── index.html   # HTML, CSS e JavaScript em um único arquivo
 └── README.md
 ```
 
