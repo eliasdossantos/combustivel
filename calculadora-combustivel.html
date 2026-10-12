@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Qual combustível compensa mais? Gasolina, etanol e diesel</title>
+    <style>
+        :root {
+            --bg: #f4f6f8;
+            --card: #fff;
+            --tx: #1b2430;
+            --mut: #667085;
+            --bd: #dfe4ea;
+            --ok: #15803d;
+            --okbg: #e8f6ec;
+            --okbd: #86d19b;
+            --ac: #2563eb;
+            --err: #b42318;
+            --errbg: #fdecea;
+            --warn: #fff7e0;
+            box-sizing: border-box;
+            padding-top: env(safe-area-inset-top, 0px);
+            padding-bottom: env(safe-area-inset-bottom, 0px)
+        }
+
+        @media (prefers-color-scheme:dark) {
+            :root:not([data-theme="light"]) {
+                --bg: #0f141a;
+                --card: #18202a;
+                --tx: #e8edf3;
+                --mut: #9aa7b5;
+                --bd: #2a3541;
+                --ok: #4ade80;
+                --okbg: #12301d;
+                --okbd: #2c6b43;
+                --ac: #6ea0ff;
+                --err: #ff8a80;
+                --errbg: #3a1a18;
+                --warn: #2d2812;
+                color-scheme: dark
+            }
+        }
+
+        :root[data-theme="dark"] {
+            --bg: #0f141a;
+            --card: #18202a;
+            --tx: #e8edf3;
+            --mut: #9aa7b5;
+            --bd: #2a3541;
+            --ok: #4ade80;
+            --okbg: #12301d;
+            --okbd: #2c6b43;
+            --ac: #6ea0ff;
+            --err: #ff8a80;
+            --errbg: #3a1a18;
+            --warn: #2d2812;
+            color-scheme: dark
+        }
+
+        :root[data-theme="light"] {
+            color-scheme: light
+        }
+
+        *,
+        *:before,
+        *:after {
+            box-sizing: inherit
+        }
+
+        html {
+            scroll-padding-top: env(safe-area-inset-top, 0px)
+        }
+
+        body {
+            margin: 0;
+            color: var(--tx);
+            font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            background: radial-gradient(900px 300px at 10% -5%, color-mix(in srgb, var(--ac) 14%, transparent), transparent), var(--bg)
+        }
+
+        main {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 20px 16px 40px
+        }
+
+        h2 {
+            font-size: 1.05rem;
+            margin: 0 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .hero {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 22px
+        }
+
+        .hero h1 {
+            font-size: 1.9rem;
+            line-height: 1.15;
+            margin: 0 0 4px
+        }
+
+        .sub {
+            color: var(--mut);
+            margin: 0
+        }
+
+        .grid {
+            display: grid;
+            gap: 16px;
+            grid-template-columns: 1fr
+        }
+
+        .cards {
+            display: grid;
+            gap: 16px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr))
+        }
+
+        @media(min-width:800px) {
+            .full {
+                grid-column: 1/-1
+            }
+        }
+
+        @media(min-width:900px) {
+            main>.grid {
+                grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+                align-items: start
+            }
+
+            main>.grid>#out {
+                grid-column: 2;
+                grid-row: 1/span 2
+            }
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--bd);
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: 0 1px 2px rgba(16, 24, 40, .06), 0 10px 28px rgba(16, 24, 40, .05)
+        }
+
+        .row {
+            display: grid;
+            gap: 12px;
+            grid-template-columns: 1fr 1fr
+        }
+
+        @media(max-width:480px) {
+            .row {
+                grid-template-columns: 1fr
+            }
+
+            .themebtn span {
+                display: none
+            }
+
+            .hero h1 {
+                font-size: 1.5rem
+            }
+        }
+
+        label {
+            display: block;
+            font-size: .85rem;
+            font-weight: 600;
+            margin-bottom: 4px
+        }
+
+        .f {
+            margin-bottom: 12px
+        }
+
+        .f small {
+            color: var(--mut);
+            font-size: .78rem
+        }
+
+        input {
+            width: 100%;
+            font: inherit;
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 12px;
+            border: 1px solid var(--mut);
+            border-radius: 10px;
+            background: var(--card);
+            color: var(--tx);
+            -webkit-text-fill-color: var(--tx);
+            caret-color: var(--ac);
+            opacity: 1
+        }
+
+        input::placeholder {
+            color: var(--mut);
+            font-weight: 400;
+            opacity: .75;
+            -webkit-text-fill-color: var(--mut)
+        }
+
+        input:focus {
+            outline: 2px solid var(--ac);
+            outline-offset: 1px
+        }
+
+        input.bad {
+            border-color: var(--err)
+        }
+
+        .ic {
+            width: 20px;
+            height: 20px;
+            flex: none;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+
+        h2>.ic {
+            width: 34px;
+            height: 34px;
+            padding: 7px;
+            border-radius: 10px;
+            background: color-mix(in srgb, var(--ac) 14%, transparent);
+            color: var(--ac)
+        }
+
+        button {
+            font: inherit;
+            cursor: pointer;
+            border-radius: 10px;
+            border: 1px solid var(--bd);
+            background: var(--card);
+            color: var(--tx);
+            padding: 9px 14px
+        }
+
+        .themebtn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border-radius: 999px;
+            font-size: .88rem;
+            font-weight: 600;
+            flex: none
+        }
+
+        .tools {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap
+        }
+
+        .info {
+            border-radius: 50%;
+            padding: 2px;
+            width: 26px;
+            height: 26px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center
+        }
+
+        .seg {
+            display: flex;
+            gap: 6px;
+            background: var(--bg);
+            padding: 4px;
+            border-radius: 12px;
+            margin-bottom: 14px
+        }
+
+        .seg button {
+            flex: 1;
+            border: 0;
+            background: transparent;
+            padding: 9px 8px;
+            border-radius: 9px;
+            font-weight: 600;
+            color: var(--mut)
+        }
+
+        .seg button.on {
+            background: var(--card);
+            color: var(--tx);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .18)
+        }
+
+        .fz {
+            padding: 12px;
+            border: 1px solid var(--bd);
+            border-radius: 12px;
+            margin-bottom: 12px
+        }
+
+        .fz .f {
+            margin-bottom: 0
+        }
+
+        .fh {
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px
+        }
+
+        .fh small {
+            color: var(--mut);
+            font-weight: 400
+        }
+
+        .tip {
+            background: var(--warn);
+            border: 1px solid var(--bd);
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: .88rem;
+            margin: 8px 0
+        }
+
+        .msg {
+            background: var(--errbg);
+            color: var(--err);
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            font-size: .92rem
+        }
+
+        .hint {
+            color: var(--mut);
+            text-align: center;
+            padding: 24px 8px
+        }
+
+        .rec {
+            background: var(--okbg);
+            border: 2px solid var(--okbd);
+            border-radius: 16px;
+            padding: 18px;
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            color: var(--ok);
+            box-shadow: 0 8px 24px rgba(21, 128, 61, .12)
+        }
+
+        .rec .ic {
+            width: 40px;
+            height: 40px
+        }
+
+        .rec b {
+            font-size: 1.3rem;
+            display: block;
+            line-height: 1.25
+        }
+
+        .rec span {
+            color: var(--tx);
+            font-size: .95rem
+        }
+
+        .fuel {
+            border: 1px solid var(--bd);
+            border-radius: 14px;
+            padding: 14px;
+            background: var(--card)
+        }
+
+        .fuel.win {
+            background: var(--okbg);
+            border: 2px solid var(--okbd)
+        }
+
+        .fuel h3 {
+            margin: 0 0 8px;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .fuel.win h3 {
+            color: var(--ok)
+        }
+
+        .fuel h3 .ok {
+            margin-left: auto
+        }
+
+        .kv {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 5px 0;
+            border-top: 1px dashed var(--bd);
+            font-size: .92rem
+        }
+
+        .kv:first-of-type {
+            border-top: 0
+        }
+
+        .kv b {
+            text-align: right
+        }
+
+        .big {
+            font-size: 1.2rem
+        }
+
+        .note {
+            color: var(--mut);
+            font-size: .88rem;
+            margin: 8px 0 0
+        }
+
+        .warn {
+            background: var(--warn);
+            border: 1px solid var(--bd);
+            border-radius: 12px;
+            padding: 12px 14px;
+            font-size: .88rem
+        }
+
+        .bar {
+            height: 10px;
+            border-radius: 6px;
+            background: var(--bd);
+            overflow: hidden;
+            display: flex;
+            margin: 8px 0
+        }
+
+        .bar i {
+            display: block;
+            height: 100%
+        }
+
+        [hidden] {
+            display: none !important
+        }
+    </style>
+</head>
+
+<body>
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <symbol id="i-gas" viewBox="0 0 24 24">
+            <path
+                d="M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16M3 21h12M14 9h2a2 2 0 0 1 2 2v5a1.5 1.5 0 0 0 3 0V8l-3-3M7 8h4" />
+        </symbol>
+        <symbol id="i-eth" viewBox="0 0 24 24">
+            <path d="M5 19c0-8 5-14 15-14 0 10-6 15-14 15M5 19l9-9" />
+        </symbol>
+        <symbol id="i-drop" viewBox="0 0 24 24">
+            <path d="M12 3s6 6.500 6 11a6 6 0 0 1-12 0c0-4.500 6-11 6-11z" />
+        </symbol>
+        <symbol id="i-km" viewBox="0 0 24 24">
+            <path d="M12 14l4-4M3.5 17a9 9 0 1 1 17 0" />
+            <circle cx="12" cy="14" r="1" />
+        </symbol>
+        <symbol id="i-coin" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9" />
+            <path
+                d="M14.5 9c-.5-1-1.500-1.500-2.500-1.500-1.500 0-2.500.8-2.500 2s1 1.700 2.500 2 2.500.8 2.500 2-1 2-2.500 2c-1 0-2-.5-2.500-1.500M12 6v1.500M12 16.500V18" />
+        </symbol>
+        <symbol id="i-ok" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M8 12.500l3 3 5-6" />
+        </symbol>
+        <symbol id="i-info" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 11v5M12 8h.01" />
+        </symbol>
+        <symbol id="i-flask" viewBox="0 0 24 24">
+            <path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3" />
+        </symbol>
+        <symbol id="i-sun" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="4" />
+            <path
+                d="M12 2v2M12 20v2M4.900 4.900l1.400 1.400M17.700 17.700l1.400 1.400M2 12h2M20 12h2M4.900 19.100l1.400-1.400M17.700 6.300l1.400-1.400" />
+        </symbol>
+        <symbol id="i-moon" viewBox="0 0 24 24">
+            <path d="M21 12.800A9 9 0 1 1 11.200 3a7 7 0 0 0 9.800 9.800z" />
+        </symbol>
+    </svg>
+
+    <main>
+        <header class="hero">
+            <div>
+                <h1>⛽ Qual combustível compensa mais?</h1>
+                <p class="sub">Compare gasolina comum, aditivada, etanol e diesel. Os resultados atualizam
+                    automaticamente.</p>
+            </div>
+            <button type="button" class="themebtn" id="themeBtn"></button>
+        </header>
+
+        <div class="grid">
+            <section class="card">
+                <h2><svg class="ic">
+                        <use href="#i-coin" />
+                    </svg>Preços e consumo</h2>
+                <div class="seg" role="group" aria-label="Tipo de combustível">
+                    <button type="button" data-m="flex" class="on">Gasolina / Etanol</button>
+                    <button type="button" data-m="diesel">Diesel</button>
+                </div>
+                <p class="note" style="margin:0 0 12px">Informe o preço de pelo menos dois combustíveis. O consumo
+                    (km/l) é opcional, mas deixa o resultado muito mais preciso.</p>
+                <div id="fields"></div>
+                <div class="f"><label for="bud">Quanto quer gastar no abastecimento? <small>(opcional)</small></label>
+                    <input id="bud" data-money inputmode="numeric" placeholder="R$ 0,00" autocomplete="off">
+                </div>
+                <div class="tools"><button type="button" id="clear">Limpar tudo</button></div>
+            </section>
+
+            <section class="card" id="compCard">
+                <h2><svg class="ic">
+                        <use href="#i-flask" />
+                    </svg>Composição do combustível
+                    <button type="button" class="info" id="infoBtn" aria-expanded="false" aria-controls="infoTip"
+                        aria-label="Mais informações"><svg class="ic"
+                            style="width:18px;height:18px;padding:0;background:none">
+                            <use href="#i-info" />
+                        </svg></button>
+                </h2>
+                <div class="tip" id="infoTip" hidden>O percentual representa a proporção de <b>etanol anidro</b>
+                    misturado à gasolina, e não o etanol hidratado vendido separadamente nos postos.</div>
+                <div class="f"><label for="mix">Percentual de etanol na gasolina (%)</label>
+                    <input id="mix" type="number" min="0" max="100" step="0.1" inputmode="decimal" value="30">
+                </div>
+                <p class="note" style="margin-top:0" id="mixTxt"></p>
+                <div class="tools" style="margin-top:10px"><button type="button" id="resetMix">Restaurar 30%</button>
+                </div>
+                <p class="note">A gasolina (comum ou aditivada) já contém etanol, portanto não é gasolina pura. Este
+                    valor é <b>apenas informativo</b>: não altera o consumo nem o custo por km.</p>
+            </section>
+
+            <section class="full" id="out" aria-live="polite"></section>
+
+            <div class="warn full" id="warnF">A gasolina comercializada contém etanol anidro em sua composição. O
+                percentual padrão desta calculadora é de 30%, mas você pode ajustá-lo. A composição efetiva depende do
+                tipo de gasolina e da regulamentação vigente. A proporção de etanol na gasolina, isoladamente, não
+                determina qual combustível oferece o menor custo por quilômetro. Para essa comparação, utilize o consumo
+                real do seu veículo. Nenhum ganho de consumo é aplicado automaticamente à gasolina aditivada: informe o
+                consumo real que você obtém com ela.</div>
+            <div class="warn full" id="warnD" hidden>O diesel só pode ser usado em veículos a diesel e não é comparável
+                à gasolina ou ao etanol. O consumo varia com o veículo, a carga e a condução, e nenhum ganho de consumo
+                é aplicado automaticamente ao diesel aditivado: utilize o consumo real que você mede com cada
+                combustível.</div>
+        </div>
+    </main>
+
+    <script>
+        /* ---------- Utilitários ---------- */
+        const $ = id => document.getElementById(id);
+        const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+        const nf = d => new Intl.NumberFormat('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d });
+        const n1 = nf(1), n2 = nf(2), n3 = nf(3);
+        const brl3 = v => 'R$ ' + n3.format(v);
+        const icon = n => `<svg class="ic"><use href="#i-${n}"/></svg>`;
+
+        /* Máscara monetária: guarda os dígitos como centavos (inteiro) para evitar erros de ponto flutuante. */
+        function maskMoney(el) {
+            const d = el.value.replace(/\D/g, '').replace(/^0+/, '').slice(0, 9);
+            el.dataset.cents = d;
+            el.value = d ? brl.format(parseInt(d, 10) / 100) : '';
+        }
+        const money = el => el.dataset.cents ? parseInt(el.dataset.cents, 10) / 100 : null;
+
+        /* Consumo: digitar 25 mostra "25 km/l"; o cursor fica antes da unidade */
+        function maskDec(el) {
+            let v = el.value.replace(/[^\d.,]/g, '').replace(/\./g, ',');
+            const i = v.indexOf(','); if (i >= 0) v = v.slice(0, i + 1) + v.slice(i + 1).replace(/,/g, '');
+            v = v.slice(0, 6);
+            el.value = v ? v + ' km/l' : '';
+            if (v) el.setSelectionRange(v.length, v.length);
+        }
+        const num = el => el.value.replace(/[^\d,]/g, '');
+        const dec = el => { const t = num(el); return (t === '' || t === ',') ? null : parseFloat(t.replace(',', '.')); };
+
+        /* ---------- Combustíveis por tipo de veículo ---------- */
+        const FUELS = [
+            { k: 'gc', n: 'Gasolina comum', ic: 'gas', m: 'flex', g: 1 },
+            { k: 'ga', n: 'Gasolina aditivada', ic: 'gas', m: 'flex', g: 1, opt: 1 },
+            { k: 'et', n: 'Etanol', ic: 'eth', m: 'flex' },
+            { k: 'dc', n: 'Diesel comum', ic: 'drop', m: 'diesel' },
+            { k: 'da', n: 'Diesel aditivado', ic: 'drop', m: 'diesel', opt: 1 }
+        ];
+        let mode = 'flex';
+
+        function buildFields() {
+            $('fields').innerHTML = FUELS.map(f => `<div class="fz" data-m="${f.m}">
+    <div class="fh">${icon(f.ic)}${f.n}${f.opt ? ' <small>(opcional)</small>' : ''}</div>
+    <div class="row">
+      <div class="f"><label for="p_${f.k}">Preço por litro</label><input id="p_${f.k}" data-money inputmode="numeric" placeholder="R$ 0,00" autocomplete="off"></div>
+      <div class="f"><label for="c_${f.k}">Consumo (km/l)</label><input id="c_${f.k}" data-dec inputmode="decimal" placeholder="Ex.: 12,5 km/l" autocomplete="off"></div>
+    </div></div>`).join('');
+        }
+
+        /* ---------- Cálculo e renderização ---------- */
+        function calc() {
+            const out = $('out'), flex = mode === 'flex';
+            document.querySelectorAll('input.bad').forEach(e => e.classList.remove('bad'));
+            const errs = []; const bad = (id, m) => { errs.push(m); $(id).classList.add('bad') };
+            const bud = money($('bud')), mixRaw = $('mix').value.trim(), mix = parseFloat(mixRaw);
+            const mixOk = mixRaw !== '' && !isNaN(mix) && mix >= 0 && mix <= 100;
+            if (flex && !mixOk) bad('mix', 'O percentual de etanol na gasolina deve estar entre 0% e 100%.');
+            $('mixTxt').textContent = mixOk ? `${n1.format(mix).replace(',0', '')}% de etanol anidro na gasolina (valor padrão editável)` : '';
+
+            const list = FUELS.filter(f => f.m === mode).map(f => ({ ...f, p: money($('p_' + f.k)), c: dec($('c_' + f.k)) }));
+            list.forEach(f => {
+                if (f.p === null && f.c !== null) bad('p_' + f.k, `Informe o preço: ${f.n}.`);
+                if (f.c !== null && (isNaN(f.c) || f.c <= 0)) bad('c_' + f.k, `O consumo (${f.n}) deve ser maior que zero.`);
+            });
+            let html = errs.map(e => `<div class="msg">⚠️ ${e}</div>`).join('');
+            if (errs.length) { out.innerHTML = html; return; }
+
+            const priced = list.filter(f => f.p !== null), full = priced.filter(f => f.c !== null);
+            if (priced.length < 2) {
+                out.innerHTML = `<div class="card hint"><div style="font-size:2.5rem">⛽</div>Informe o preço de pelo menos dois combustíveis para comparar. O consumo (km/l) é opcional e deixa o resultado mais preciso.</div>`;
+                return;
+            }
+
+            /* Custo por km = preço por litro ÷ consumo (km/l). Usa só combustíveis com preço e consumo. */
+            const comparing = full.length >= 2, cpk = {};
+            let win = null, worst = null;
+            if (comparing) {
+                full.forEach(f => cpk[f.k] = f.p / f.c);
+                const s = [...full].sort((a, b) => cpk[a.k] - cpk[b.k]);
+                if (Math.abs(cpk[s[0].k] - cpk[s[s.length - 1].k]) > 1e-9) { win = s[0]; worst = s[s.length - 1]; }
+            }
+
+            /* Regra dos 70%: preço do etanol ÷ preço da gasolina (estimativa, usada sem consumo) */
+            const gas = priced.filter(f => f.g), et = priced.find(f => f.k === 'et');
+            let pw = null, banner;
+            if (comparing) {
+                if (win) {
+                    const dKm = cpk[worst.k] - cpk[win.k], pct = dKm / cpk[win.k] * 100;
+                    banner = [`Abasteça com ${win.n.toLowerCase()}`, `Economia de ${brl.format(dKm * 100)} a cada 100 km (${brl3(dKm)} por km) em relação a ${worst.n.toLowerCase()}, que custa ${n1.format(pct)}% mais por km.`];
+                } else banner = ['Empate técnico', 'Os combustíveis comparados têm o mesmo custo por km.'];
+            } else if (flex && et && gas.length) {
+                const g = gas[0], r = et.p / g.p * 100; pw = r <= 70 ? et : g;
+                banner = [`Pela regra dos 70%: abasteça com ${pw.n.toLowerCase()}`, `O etanol custa ${n1.format(r)}% do preço da ${g.n.toLowerCase()} (${r <= 70 ? 'igual ou abaixo de' : 'acima de'} 70%). É uma estimativa aproximada.`];
+            } else {
+                pw = [...priced].sort((a, b) => a.p - b.p)[0];
+                banner = [`${pw.n} é o mais barato por litro`, 'O preço por litro não considera o consumo. Informe o consumo (km/l) de pelo menos dois combustíveis para comparar o custo por km.'];
+            }
+            const wk = comparing ? (win && win.k) : (pw && pw.k);
+            html += `<div class="rec" ${comparing && !win ? 'style="color:var(--tx)"' : ''}>${icon(comparing && !win ? 'info' : 'ok')}<div><b>${banner[0]}</b><span>${banner[1]}</span></div></div>`;
+
+            /* Cartões: preço, custo por km, 100 km, litros e autonomia (se houver valor) */
+            const card = f => {
+                const w = f.k === wk;
+                let h = `<div class="fuel ${w ? 'win' : ''}"><h3>${icon(f.ic)}${f.n}${w ? `<span class="ok">${icon('ok')}</span>` : ''}</h3>
+      <div class="kv"><span>Preço por litro</span><b>${brl.format(f.p)}</b></div>`;
+                if (f.c !== null) {
+                    const c = f.p / f.c;
+                    h += `<div class="kv"><span>Consumo</span><b>${n1.format(f.c)} km/l</b></div>
+        <div class="kv"><span>Custo por km</span><b class="big">${brl3(c)}</b></div>
+        <div class="kv"><span>A cada 100 km</span><b>${brl.format(c * 100)}</b></div>`;
+                    if (comparing && win && !w) { const b = cpk[win.k]; h += `<div class="kv"><span>Vs. ${win.n.toLowerCase()}</span><b>+${brl.format((c - b) * 100)}/100 km (+${n1.format((c - b) / b * 100)}%)</b></div>`; }
+                } else if (comparing) h += `<div class="kv"><span>Custo por km</span><b>sem consumo</b></div>`;
+                if (bud) { const L = bud / f.p; h += `<div class="kv"><span>Litros pelo valor</span><b>${n2.format(L)} L</b></div>` + (f.c !== null ? `<div class="kv"><span>Autonomia estimada</span><b>${n1.format(L * f.c)} km</b></div>` : ''); }
+                return h + '</div>';
+            };
+            html += `<div class="cards" style="margin-top:16px">${priced.map(card).join('')}</div>`;
+
+            /* Regra dos 70% x consumo real, para cada tipo de gasolina */
+            if (flex && et && gas.length) {
+                const rl = gas.map(g => {
+                    const r = et.p / g.p * 100, rw = r <= 70 ? et : g;
+                    let t = `Etanol = <b>${n1.format(r)}%</b> do preço da ${g.n.toLowerCase()}: a regra dos 70% indica <b>${rw.n.toLowerCase()}</b>.`;
+                    if (g.c !== null && et.c !== null) {
+                        const a = g.p / g.c, b = et.p / et.c, rv = Math.abs(a - b) < 1e-9 ? null : (b < a ? et : g);
+                        t += !rv ? ' Pelo consumo real há empate.' : rv === rw ? ' O consumo real confirma esse resultado.' : ` <b>Mas</b> pelo seu consumo real, ${rv.n.toLowerCase()} compensa mais — priorizamos o consumo real.`;
+                        t += ` No seu veículo, os custos por km se igualam com o etanol a cerca de ${n1.format(et.c / g.c * 100)}% do preço da gasolina.`;
+                    }
+                    return `<p style="margin:0 0 8px">${t}</p>`;
+                }).join('');
+                html += `<div class="card" style="margin-top:16px"><h2>${icon('km')}Regra dos 70% x consumo real</h2>${rl}<p class="note">A regra dos 70% é uma referência aproximada e não substitui o consumo real do veículo.</p></div>`;
+            }
+
+            /* Simulação: litros = valor ÷ preço; autonomia = litros × consumo */
+            if (bud) {
+                let s = `<div class="card" style="margin-top:16px"><h2>${icon('coin')}Simulação de abastecimento</h2><p style="margin:0 0 8px">Com <b>${brl.format(bud)}</b>:</p>`;
+                priced.forEach(f => { const L = bud / f.p; s += `<div class="kv"><span>${f.n}</span><b>${n2.format(L)} L${f.c !== null ? ` · ${n1.format(L * f.c)} km` : ''}</b></div>`; });
+                if (comparing && win) s += `<p class="note">Maior autonomia para o mesmo valor: <b>${win.n.toLowerCase()}</b> (${n1.format(bud / win.p * win.c)} km).</p>`;
+                html += s + '</div>';
+            }
+
+            /* Composição volumétrica (informativa): não altera consumo nem custo */
+            if (flex && gas.length) {
+                const L = bud ? bud / gas[0].p : 1, e = L * mix / 100;
+                html += `<div class="card" style="margin-top:16px"><h2>${icon('flask')}Composição da gasolina${bud ? '' : ' (1 litro)'}</h2>
+      <div class="kv"><span>Volume total de gasolina</span><b>${n2.format(L)} L</b></div>
+      <div class="kv"><span>Etanol anidro (${n1.format(mix)}%)</span><b>${n2.format(e)} L</b></div>
+      <div class="kv"><span>Gasolina A (parcela sem etanol)</span><b>${n2.format(L - e)} L</b></div>
+      <div class="bar" aria-hidden="true"><i style="width:${100 - mix}%;background:var(--mut)"></i><i style="width:${mix}%;background:var(--ok)"></i></div>
+      <p class="note">Composição apenas informativa: nenhum desconto ou acréscimo é aplicado ao consumo.</p></div>`;
+            }
+            out.innerHTML = html;
+        }
+
+        function setMode(m) {
+            mode = m;
+            document.querySelectorAll('.fz').forEach(e => e.hidden = e.dataset.m !== m);
+            document.querySelectorAll('.seg button').forEach(b => b.classList.toggle('on', b.dataset.m === m));
+            $('compCard').hidden = m !== 'flex'; $('warnF').hidden = m !== 'flex'; $('warnD').hidden = m === 'flex';
+            calc();
+        }
+
+        /* ---------- Eventos ---------- */
+        buildFields();
+        document.querySelectorAll('[data-money]').forEach(el => el.addEventListener('input', () => { maskMoney(el); calc() }));
+        document.querySelectorAll('[data-dec]').forEach(el => {
+            el.addEventListener('input', () => { maskDec(el); calc() });
+            const f = () => { const n = num(el).length; if (el.value) setTimeout(() => el.setSelectionRange(n, n), 0) };
+            el.addEventListener('focus', f); el.addEventListener('click', f);
+        });
+        $('mix').addEventListener('input', calc);
+        $('resetMix').onclick = () => { $('mix').value = 30; calc() };
+        $('clear').onclick = () => {
+            document.querySelectorAll('[data-money],[data-dec]').forEach(el => { el.value = ''; el.dataset.cents = '' });
+            $('mix').value = 30; calc();
+        };
+        document.querySelectorAll('.seg button').forEach(b => b.onclick = () => setMode(b.dataset.m));
+        $('infoBtn').onclick = () => { const t = $('infoTip'); t.hidden = !t.hidden; $('infoBtn').setAttribute('aria-expanded', String(!t.hidden)) };
+
+        /* ---------- Tema claro/escuro (segue o sistema até o usuário escolher) ---------- */
+        const root = document.documentElement, mq = matchMedia('(prefers-color-scheme: dark)');
+        const isDark = () => root.dataset.theme ? root.dataset.theme === 'dark' : mq.matches;
+        function paintTheme() {
+            const d = isDark();
+            $('themeBtn').innerHTML = `<svg class="ic"><use href="#i-${d ? 'sun' : 'moon'}"/></svg><span>${d ? 'Claro' : 'Escuro'}</span>`;
+            $('themeBtn').setAttribute('aria-label', d ? 'Mudar para tema claro' : 'Mudar para tema escuro');
+        }
+        try { const s = localStorage.getItem('tema'); if (s) root.dataset.theme = s } catch (e) { }
+        $('themeBtn').onclick = () => { const t = isDark() ? 'light' : 'dark'; root.dataset.theme = t; try { localStorage.setItem('tema', t) } catch (e) { } paintTheme() };
+        if (mq.addEventListener) mq.addEventListener('change', paintTheme);
+        paintTheme();
+        setMode('flex');
+    </script>
+</body>
+
+</html>
