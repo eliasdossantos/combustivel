@@ -1,5 +1,9 @@
 # ⛽ Combustível
 
+## Acesse o sistema:
+
+- **https://combustivel-psi.vercel.app/**
+
 Calculadora web para descobrir **qual combustível compensa mais na hora de abastecer**: gasolina comum, gasolina aditivada, etanol ou diesel. A decisão considera o preço por litro e o **consumo real** do carro ou da moto.
 
 Feita com **HTML5, CSS3 e JavaScript puro**, em um único arquivo, sem frameworks, bibliotecas ou etapa de build.
